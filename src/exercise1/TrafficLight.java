@@ -4,7 +4,6 @@ import greenfoot.Actor;
 import greenfoot.GreenfootImage;
 
 public class TrafficLight extends Actor{
-
 	public enum Color{
 		GREEN,
 		YELLOW,
@@ -20,10 +19,9 @@ public class TrafficLight extends Actor{
 	}
 	
 	public void setColor(Color newColor){
-		//GreenfootImage image = new GreenfootImage(colorImages[newColor.ordinal()]);
-		//setImage(image);
 		setImage(colorImages[newColor.ordinal()]);
 	}
+	
 	
 	public void act(){
 		
