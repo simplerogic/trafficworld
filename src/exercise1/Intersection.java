@@ -21,6 +21,8 @@ public class Intersection extends Actor {
 	private ArrayList<Car> previousCars = new ArrayList<Car>();
 	private ArrayList<Car> inCurrentCars = new ArrayList<Car>();
 	private ArrayList<Car> inPreviousCars = new ArrayList<Car>();
+	//private ArrayList<Car> leCurrentCars = new ArrayList<Car>();
+	//private ArrayList<Car> lePreviousCars = new ArrayList<Car>();
 	
 	public Intersection(int roadwidth) {
 		GreenfootImage intersection = new GreenfootImage(roadwidth, roadwidth);
@@ -45,32 +47,36 @@ public class Intersection extends Actor {
 	}
 	@SuppressWarnings("unchecked")
 	private void notifyLeavingCars() {
-		currentCars = (ArrayList<Car>) getObjectsInRange(50, Car.class);
+		//leCurrentCars = (ArrayList<Car>) getIntersectingObjects(Car.class);
 		for (Car c : previousCars){
+			//System.out.println(c);
 			if (!currentCars.contains(c)){
 				c.notifyLeaving(this);
 			}
-			previousCars = currentCars;
+			//lePreviousCars = leCurrentCars;
+			
 		}
+		previousCars = currentCars;
 	}
 	@SuppressWarnings("unchecked")
 	private void notifyInCars() {
-		inCurrentCars = (ArrayList<Car>) this.getIntersectingObjects(Car.class);
-		for (Car c2 : inCurrentCars){
-			if (!inPreviousCars.contains(c2)){
-				c2.notifyInside(this);
+		inCurrentCars = (ArrayList<Car>) getIntersectingObjects(Car.class);
+		for (Car c : inCurrentCars){
+			if (!inPreviousCars.contains(c)){
+				c.notifyInside(this);
 			}
-			inPreviousCars = inCurrentCars;
 		}
+		inPreviousCars = inCurrentCars;
+
 	}
 	@SuppressWarnings("unchecked")
 	private void notifyApproachingCars() {
-		currentCars = (ArrayList<Car>) getObjectsInRange(30, Car.class);
-		for (Car c3 : currentCars){
-			if (!previousCars.contains(c3)){
-				c3.notifyApproaching(this);
+		currentCars = (ArrayList<Car>) getObjectsInRange(40, Car.class);
+		for (Car c : currentCars){
+			if (!previousCars.contains(c)){
+				c.notifyApproaching(this);
 			}
-			previousCars = currentCars;
+			
 		}
 	}
 	public Color getHorizontalTrafficLights(){
@@ -135,8 +141,9 @@ public class Intersection extends Actor {
 			}
 			break;
 		}
-		notifyApproachingCars();
 		notifyInCars();
+
+		notifyApproachingCars();
 		notifyLeavingCars();
 	}
 }

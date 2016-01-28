@@ -26,11 +26,12 @@ public class TrafficWorld extends World {
 		
 		gap = ((HEIGHT - (roadwidth * horizontalroadnum)) / (horizontalroadnum - 1));
 		horizontalspacing = roadwidth + gap;
+		System.out.println(horizontalspacing);
 		gap = ((WIDTH - (roadwidth * verticalroadnum)) / (verticalroadnum - 1));
 		verticalspacing = roadwidth + gap;
-		
+		System.out.println(verticalspacing);
 		roadoffset = (roadwidth*.25) ;
-		Car test = new Car(this,180,50,200,1);
+		//Car test = new Car(this,180,50,200,1);
 
 		placeIntersections();
 		placeHorizontalRoads();
@@ -50,9 +51,9 @@ public class TrafficWorld extends World {
 	private void placeVerticalRoads() {
 		for (int i = roadwidth / 2; i < WIDTH; i+=verticalspacing + 1){
 			startposy = Greenfoot.getRandomNumber(HEIGHT);
-		    //Car car = new Car(this, 90, i - roadoffset, startposy, 2);
+		    Car car = new Car(this, 90, i - roadoffset, startposy, 2);
 			startposy = Greenfoot.getRandomNumber(HEIGHT);
-			//Car car2 = new Car(this, 270, i + roadoffset, startposy,2);
+			Car car2 = new Car(this, 270, i + roadoffset, startposy,2);
 			Road2 road2 = new Road2(this,i, HEIGHT / 2 ,roadwidth,HEIGHT);
 			this.addObject(road2,  0, 0);
 		}
@@ -60,9 +61,9 @@ public class TrafficWorld extends World {
 	private void placeHorizontalRoads() {
 		for (int i = roadwidth/2; i < 750; i+=horizontalspacing){
 			startposx = Greenfoot.getRandomNumber(WIDTH);
-			//Car car = new Car(this, 180, startposx, roadoffset + i , 2);
+			Car car = new Car(this, 180, startposx, roadoffset + i , 2);
 			startposx = Greenfoot.getRandomNumber(WIDTH);
-			//Car car2 = new Car(this, 0, startposx, roadoffset + i - roadwidth / 2 , 2);
+			Car car2 = new Car(this, 0, startposx, roadoffset + i - roadwidth / 2 , 2);
 			Road road = new Road(this, WIDTH / 2 ,i,roadwidth,WIDTH);
 			this.addObject(road,  0, 0);
 		}

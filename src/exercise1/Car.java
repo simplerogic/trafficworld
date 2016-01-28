@@ -50,7 +50,7 @@ public class Car extends Actor implements IntersectionListener{
 	public void act() {
 		move(speed);
 
-		System.out.println(horlight +" " +vertlight);
+		//System.out.println(horlight +" " +vertlight);
 		if (this.isAtEdge()) {
 			if (rotation == 0) {
 				this.setLocation(0, getY());
@@ -64,66 +64,67 @@ public class Car extends Actor implements IntersectionListener{
 				this.setLocation(getX(), TrafficWorld.HEIGHT);
 			}
 		}
-		System.out.println(speed);
+		//System.out.println(speed);
+		//System.out.println(state);
+
 		switch(state){
+
 		case OUTSIDE:
 			speedUp();
 			break;
+		case INSIDE:
+			if (getCarRotation() == 180 || getCarRotation() == 0){
+				if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN)){
+					speedUp();
+				} else if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.YELLOW)){
+					speedUp();
+				} else if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.RED)){
+					stop();
+				}
+			} 
+			if (getCarRotation() == 270 || getCarRotation() == 90){
+				if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.GREEN)){
+					speedUp();
+				} else if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.YELLOW) ){
+					speedUp();
+				} else if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.RED) ){
+					stop();
+				}
+			}
+			break;
 		case APPROACHING:
 			if (getCarRotation() == 180  || getCarRotation() == 0){
-				if (horlight.equals(TrafficLight.Color.GREEN)){
+				if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN)){
 					speedUp();
 				} else {
 					slowDown();
 				}
 			} else if (getCarRotation() == 90 || getCarRotation() == 270){
-				if (vertlight.equals(TrafficLight.Color.GREEN)){
+				if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.GREEN)){
 					speedUp();
 				} else {
 					slowDown();
-				}
-		}
-			break;
-		case INSIDE:
-			if (getCarRotation() == 180 || getCarRotation() == 0){
-				if (horlight.equals(TrafficLight.Color.GREEN)){
-					speedUp();
-				} else if (horlight.equals(TrafficLight.Color.RED) && speed > 1){
-					speedUp();
-				} else if (horlight.equals(TrafficLight.Color.RED) && speed <= 1){
-					stop();
-				}
-			} 
-			if (getCarRotation() == 270 || getCarRotation() == 90){
-				if (vertlight.equals(TrafficLight.Color.GREEN)){
-					speedUp();
-				} else if (vertlight.equals(TrafficLight.Color.RED) && speed > 1){
-					speedUp();
-				} else if (vertlight.equals(TrafficLight.Color.RED) && speed <= 1){
-					speed = 0;
+					//stop();
 				}
 			}
 			break;
+
 		}
-		System.out.println(state);
 	}
 
 	private void stop() {
-		if (speed < 0){
-		speed--;
-		}
-		System.out.println("STOPPING");
+		speed = 0;
 	}
 
 	private void slowDown() {
 		if (speed > 1){
-		 speed-=1;
+		 speed--;
 		}
 	}
 
 	private void speedUp() {
 		if (speed < FULLSPEED){
-		speed+=1;
+		speed++;
 		}
 	}
 
@@ -131,25 +132,21 @@ public class Car extends Actor implements IntersectionListener{
 	public void notifyApproaching(Intersection intersection) {
 		state = CarState.APPROACHING;
 		curIntersection = intersection;
-		horlight = intersection.getHorizontalTrafficLights();
-		vertlight= intersection.getVerticalTrafficLights();
-		
+		System.out.println("approaching");
 	}
 
 	@Override
 	public void notifyLeaving(Intersection intersection) {
 		state = CarState.OUTSIDE;
 		curIntersection = intersection;
-		horlight = intersection.getHorizontalTrafficLights();
-		vertlight= intersection.getVerticalTrafficLights();
+		System.out.println("leaving");
 	}
 
 	@Override
 	public void notifyInside(Intersection intersection) {
 		state = CarState.INSIDE;
 		curIntersection = intersection;
-		horlight = intersection.getHorizontalTrafficLights();
-		vertlight= intersection.getVerticalTrafficLights();
+		System.out.println("inside");
 	}
 
 	
