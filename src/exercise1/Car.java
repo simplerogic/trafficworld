@@ -1,10 +1,13 @@
 package exercise1;
 
+import java.util.ArrayList;
+import java.util.Random;
+
 import greenfoot.Actor;
 import greenfoot.Greenfoot;
 import greenfoot.GreenfootImage;
 import greenfoot.World;
-import java.util.Random;
+
 
 public class Car extends Actor implements IntersectionListener{
 	Random rand = new Random();
@@ -18,6 +21,11 @@ public class Car extends Actor implements IntersectionListener{
 	private final int FULLSPEED = 3;
 	private CarState state;
 	Intersection curIntersection;
+	private ArrayList<Car> collidingCars = new ArrayList<Car>();
+	private boolean collided = false;
+	private int explosionCounter = 1;
+	private int turnChance, turnPercentage = 6;
+
 		
 	public Car(World world, int rotation, double x, double y, int movement) {
 		this.rotation = rotation;
@@ -43,37 +51,79 @@ public class Car extends Actor implements IntersectionListener{
 		
 	}
 	
+	
+	
+	public void turn(String turnDir){
+		if (turnDir.equals("left")){
+			if (this.getRotation() == 270){
+				this.setRotation(0);
+			} else {
+				this.setRotation(getRotation() + 90);
+			}
+		} else if (turnDir.equals("right")){
+			if (this.getRotation() == 0){
+				this.setRotation(270);
+			} else {
+				this.setRotation(this.getRotation() - 90);
+			}
+		}
+		
+	}
+	
+	
+	public void collisionCheck(){
+		try{
+			if(this.getWorld() != null){
+				if (this.isTouching(Car.class)){
+					throw new Error("car collision");
+				}
+			}
+		
+		} catch(Error carCollision){
+			ArrayList<Car> carCollisionList = new ArrayList<Car>();
+			carCollisionList.add(this);
+			for(Car c : (ArrayList<Car>) this.getIntersectingObjects(Car.class)){
+				carCollisionList.add(c);
+			}
+			for(Car c : carCollisionList){
+				c.collided = true;
+			}
+		}
+	}
+	
 	public int getCarRotation(){
 		return rotation;
 	}
 	
 	public void act() {
 		move(speed);
-
-		//System.out.println(horlight +" " +vertlight);
-		if (this.isAtEdge()) {
-			if (rotation == 0) {
-				this.setLocation(0, getY());
-			} else if (rotation == 180) {
-				this.setLocation(TrafficWorld.WIDTH, getY());
-			}
-			
-			if (rotation == 90) {
-				this.setLocation(getX(), 0);
-			} else if (rotation == 270) {
-				this.setLocation(getX(), TrafficWorld.HEIGHT);
+		collisionCheck();
+		edgeCheck();
+		
+		turnIfHorizontal();
+		turnIfVertical();
+		
+		
+		if (collided){
+			assert(explosionCounter<4);
+			this.setImage("images/explosion" + explosionCounter +".png");
+			explosionCounter++;
+			if (explosionCounter == 4){
+				this.getWorld().removeObject(this);
 			}
 		}
-		//System.out.println(speed);
-		//System.out.println(state);
+		
+		carStateSwitch();
+	}
 
+
+	private void carStateSwitch() {
 		switch(state){
-
 		case OUTSIDE:
 			speedUp();
 			break;
 		case INSIDE:
-			if (getCarRotation() == 180 || getCarRotation() == 0){
+			if (getRotation() == 180 || getRotation() == 0){
 				if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN)){
 					speedUp();
 				} else if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.YELLOW)){
@@ -82,7 +132,7 @@ public class Car extends Actor implements IntersectionListener{
 					stop();
 				}
 			} 
-			if (getCarRotation() == 270 || getCarRotation() == 90){
+			if (getRotation() == 270 || getRotation() == 90){
 				if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.GREEN)){
 					speedUp();
 				} else if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.YELLOW) ){
@@ -93,13 +143,13 @@ public class Car extends Actor implements IntersectionListener{
 			}
 			break;
 		case APPROACHING:
-			if (getCarRotation() == 180  || getCarRotation() == 0){
+			if (getRotation() == 180  || getRotation() == 0){
 				if (curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN)){
 					speedUp();
 				} else {
 					slowDown();
 				}
-			} else if (getCarRotation() == 90 || getCarRotation() == 270){
+			} else if (getRotation() == 90 || getRotation() == 270){
 				if (curIntersection.getVerticalTrafficLights().equals(TrafficLight.Color.GREEN)){
 					speedUp();
 				} else {
@@ -110,6 +160,57 @@ public class Car extends Actor implements IntersectionListener{
 			break;
 
 		}
+	}
+
+
+	private void turnIfHorizontal() {
+		turnChance = rand.nextInt(turnPercentage);
+		if (curIntersection != null && this.getWorld() != null) {
+			assert(curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN) || curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.YELLOW));
+			if (this.getRotation() == 0) {
+				if (turnChance == 0 && (curIntersection.getX() - (50 / 4)) == getX()) {
+					turn("left");
+				} else if (turnChance == 0 && (curIntersection.getX() + (50 / 4)) == getX()) {
+					turn("right");
+				}
+			} else if (this.getRotation() == 180) {
+				turnChance = rand.nextInt(turnPercentage);
+				if (turnChance == 0 && (curIntersection.getX() - (50 / 4)) == getX()) {
+					turn("right");
+				} else if (turnChance == 0 && (curIntersection.getX() + (50 / 4)) == getX()) {
+					turn("left");
+				}
+			}
+		}
+	}
+
+	private void turnIfVertical() {
+		turnChance = rand.nextInt(turnPercentage);
+		if (curIntersection != null && this.getWorld() != null) {
+			assert(curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN) || curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.YELLOW));
+			if (this.getRotation() == 90) {
+				if (turnChance == 0 && (curIntersection.getY() - (50 / 4)) == getY()) {
+					turn("left");
+				} else if (turnChance == 0 && (curIntersection.getY() + (50 / 4)) == getY()) {
+					turn("right");
+				}
+			} else if (this.getRotation() == 270) {
+				turnChance = rand.nextInt(turnPercentage);
+				if (turnChance == 0 && (curIntersection.getY() - (50 / 4)) == getY()) {
+					turn("right");
+				} else if (turnChance == 0 && (curIntersection.getY() + (50 / 4)) == getY()) {
+					turn("left");
+				}
+			}
+		}
+	}
+
+	private void edgeCheck() {
+		if (this.getWorld() != null){
+		if (this.isAtEdge()) {
+			this.getWorld().removeObject(this);
+		}
+	}
 	}
 
 	private void stop() {
@@ -132,21 +233,23 @@ public class Car extends Actor implements IntersectionListener{
 	public void notifyApproaching(Intersection intersection) {
 		state = CarState.APPROACHING;
 		curIntersection = intersection;
-		System.out.println("approaching");
+
+		
 	}
 
 	@Override
 	public void notifyLeaving(Intersection intersection) {
 		state = CarState.OUTSIDE;
 		curIntersection = intersection;
-		System.out.println("leaving");
+		
+		
+		
 	}
 
 	@Override
 	public void notifyInside(Intersection intersection) {
 		state = CarState.INSIDE;
 		curIntersection = intersection;
-		System.out.println("inside");
 	}
 
 	

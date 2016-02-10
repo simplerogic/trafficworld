@@ -21,8 +21,7 @@ public class Intersection extends Actor {
 	private ArrayList<Car> previousCars = new ArrayList<Car>();
 	private ArrayList<Car> inCurrentCars = new ArrayList<Car>();
 	private ArrayList<Car> inPreviousCars = new ArrayList<Car>();
-	//private ArrayList<Car> leCurrentCars = new ArrayList<Car>();
-	//private ArrayList<Car> lePreviousCars = new ArrayList<Car>();
+
 	
 	public Intersection(int roadwidth) {
 		GreenfootImage intersection = new GreenfootImage(roadwidth, roadwidth);
@@ -53,7 +52,6 @@ public class Intersection extends Actor {
 			if (!currentCars.contains(c)){
 				c.notifyLeaving(this);
 			}
-			//lePreviousCars = leCurrentCars;
 			
 		}
 		previousCars = currentCars;
