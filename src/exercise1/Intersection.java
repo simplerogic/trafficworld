@@ -16,6 +16,8 @@ public class Intersection extends Actor {
 	private int REDCount = GREENCount + YELLOWCount;
 	private Car c;
 	private TrafficLight tl = null, tl2 = null, tl3 = null, tl4 = null;
+	private static int amountCarsIn = 0, amountCarsInYellow = 0, amountCarsInRed = 0, amountCarsInBlue = 0, amountCarsInPurple = 0;
+
 	
 	private ArrayList<Car> currentCars = new ArrayList<Car>();
 	private ArrayList<Car> previousCars = new ArrayList<Car>();
@@ -46,11 +48,19 @@ public class Intersection extends Actor {
 	}
 	@SuppressWarnings("unchecked")
 	private void notifyLeavingCars() {
-		//leCurrentCars = (ArrayList<Car>) getIntersectingObjects(Car.class);
 		for (Car c : previousCars){
-			//System.out.println(c);
 			if (!currentCars.contains(c)){
 				c.notifyLeaving(this);
+				amountCarsIn++;
+				if (c.getClass().equals(RedCar.class)){
+					amountCarsInRed++;
+				} else if (c.getClass().equals(YellowCar.class)){ 
+					amountCarsInYellow++;
+				} else if (c.getClass().equals(BlueCar.class)){ 
+					amountCarsInBlue++;
+				} else if (c.getClass().equals(PurpleCar.class)){ 
+					amountCarsInPurple++;
+				}
 			}
 			
 		}
@@ -62,6 +72,7 @@ public class Intersection extends Actor {
 		for (Car c : inCurrentCars){
 			if (!inPreviousCars.contains(c)){
 				c.notifyInside(this);
+				
 			}
 		}
 		inPreviousCars = inCurrentCars;
@@ -73,6 +84,7 @@ public class Intersection extends Actor {
 		for (Car c : currentCars){
 			if (!previousCars.contains(c)){
 				c.notifyApproaching(this);
+				
 			}
 			
 		}
@@ -83,7 +95,22 @@ public class Intersection extends Actor {
 	public Color getVerticalTrafficLights(){
 		return verticalColor;
 	}
-
+	public static int getAmountCarsIn(){
+		return amountCarsIn;
+	}
+	public static int getAmountCarsInYellow(){
+		return amountCarsInYellow;
+	}
+	public static int getAmountCarsInRed(){
+		return amountCarsInRed;
+	}
+	public static int getAmountCarsInBlue(){
+		return amountCarsInBlue;
+	}
+	public static int getAmountCarsInPurple(){
+		return amountCarsInPurple;
+	}
+	
 	public void act() {
 		lightCounter++;
 		switch (verticalColor) {
@@ -140,7 +167,6 @@ public class Intersection extends Actor {
 			break;
 		}
 		notifyInCars();
-
 		notifyApproachingCars();
 		notifyLeavingCars();
 	}

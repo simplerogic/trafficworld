@@ -9,7 +9,7 @@ import greenfoot.GreenfootImage;
 import greenfoot.World;
 
 
-public class Car extends Actor implements IntersectionListener{
+public abstract class Car extends Actor implements IntersectionListener{
 	Random rand = new Random();
 	int rotation, movement, carcolor;
 	double x, y;
@@ -17,14 +17,16 @@ public class Car extends Actor implements IntersectionListener{
 	private String prevState;
 	private TrafficLight.Color horlight, vertlight;
 	private Intersection intersection;
-	private int speed = 4;
+	protected int speed = 4;
 	private final int FULLSPEED = 3;
-	private CarState state;
-	Intersection curIntersection;
-	private ArrayList<Car> collidingCars = new ArrayList<Car>();
+	protected CarState state;
+	protected Intersection curIntersection;
+	protected ArrayList<Car> collidingCars = new ArrayList<Car>();
 	private boolean collided = false;
 	private int explosionCounter = 1;
 	private int turnChance, turnPercentage = 6;
+	private static int amountCarsIn;
+
 
 		
 	public Car(World world, int rotation, double x, double y, int movement) {
@@ -54,13 +56,13 @@ public class Car extends Actor implements IntersectionListener{
 	
 	
 	public void turn(String turnDir){
-		if (turnDir.equals("left")){
+		if (turnDir.equals("right")){
 			if (this.getRotation() == 270){
 				this.setRotation(0);
 			} else {
 				this.setRotation(getRotation() + 90);
 			}
-		} else if (turnDir.equals("right")){
+		} else if (turnDir.equals("left")){
 			if (this.getRotation() == 0){
 				this.setRotation(270);
 			} else {
@@ -70,8 +72,7 @@ public class Car extends Actor implements IntersectionListener{
 		
 	}
 	
-	
-	public void collisionCheck(){
+	protected void collisionCheck(){
 		try{
 			if(this.getWorld() != null){
 				if (this.isTouching(Car.class)){
@@ -90,20 +91,17 @@ public class Car extends Actor implements IntersectionListener{
 			}
 		}
 	}
-	
-	public int getCarRotation(){
-		return rotation;
-	}
+
 	
 	public void act() {
 		move(speed);
 		collisionCheck();
 		edgeCheck();
 		
-		turnIfHorizontal();
-		turnIfVertical();
-		
-		
+		carStateSwitch();
+	}
+
+	protected void explosion() {
 		if (collided){
 			assert(explosionCounter<4);
 			this.setImage("images/explosion" + explosionCounter +".png");
@@ -112,12 +110,9 @@ public class Car extends Actor implements IntersectionListener{
 				this.getWorld().removeObject(this);
 			}
 		}
-		
-		carStateSwitch();
 	}
 
-
-	private void carStateSwitch() {
+	protected void carStateSwitch() {
 		switch(state){
 		case OUTSIDE:
 			speedUp();
@@ -141,6 +136,8 @@ public class Car extends Actor implements IntersectionListener{
 					stop();
 				}
 			}
+			
+
 			break;
 		case APPROACHING:
 			if (getRotation() == 180  || getRotation() == 0){
@@ -163,67 +160,26 @@ public class Car extends Actor implements IntersectionListener{
 	}
 
 
-	private void turnIfHorizontal() {
-		turnChance = rand.nextInt(turnPercentage);
-		if (curIntersection != null && this.getWorld() != null) {
-			assert(curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN) || curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.YELLOW));
-			if (this.getRotation() == 0) {
-				if (turnChance == 0 && (curIntersection.getX() - (50 / 4)) == getX()) {
-					turn("left");
-				} else if (turnChance == 0 && (curIntersection.getX() + (50 / 4)) == getX()) {
-					turn("right");
-				}
-			} else if (this.getRotation() == 180) {
-				turnChance = rand.nextInt(turnPercentage);
-				if (turnChance == 0 && (curIntersection.getX() - (50 / 4)) == getX()) {
-					turn("right");
-				} else if (turnChance == 0 && (curIntersection.getX() + (50 / 4)) == getX()) {
-					turn("left");
-				}
+	protected boolean edgeCheck() {
+		if (this.getWorld() != null) {
+			if (this.isAtEdge()) {
+				return true;
 			}
 		}
+		return false;
 	}
-
-	private void turnIfVertical() {
-		turnChance = rand.nextInt(turnPercentage);
-		if (curIntersection != null && this.getWorld() != null) {
-			assert(curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.GREEN) || curIntersection.getHorizontalTrafficLights().equals(TrafficLight.Color.YELLOW));
-			if (this.getRotation() == 90) {
-				if (turnChance == 0 && (curIntersection.getY() - (50 / 4)) == getY()) {
-					turn("left");
-				} else if (turnChance == 0 && (curIntersection.getY() + (50 / 4)) == getY()) {
-					turn("right");
-				}
-			} else if (this.getRotation() == 270) {
-				turnChance = rand.nextInt(turnPercentage);
-				if (turnChance == 0 && (curIntersection.getY() - (50 / 4)) == getY()) {
-					turn("right");
-				} else if (turnChance == 0 && (curIntersection.getY() + (50 / 4)) == getY()) {
-					turn("left");
-				}
-			}
-		}
-	}
-
-	private void edgeCheck() {
-		if (this.getWorld() != null){
-		if (this.isAtEdge()) {
-			this.getWorld().removeObject(this);
-		}
-	}
-	}
-
-	private void stop() {
+	
+	protected void stop() {
 		speed = 0;
 	}
 
-	private void slowDown() {
+	protected void slowDown() {
 		if (speed > 1){
 		 speed--;
 		}
 	}
 
-	private void speedUp() {
+	protected void speedUp() {
 		if (speed < FULLSPEED){
 		speed++;
 		}

@@ -3,6 +3,7 @@ package exercise1;
 import java.awt.Color;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.List;
 
 import greenfoot.Greenfoot;
 import greenfoot.GreenfootImage;
@@ -15,17 +16,20 @@ public class TrafficWorld extends World {
 	Random rand = new Random();
 	private static int horizontalspacing,verticalspacing, gap;
 	private static int horizontalroadnum = 5, verticalroadnum = 7;
-	private static Road[] HorizontalRoads = new Road[horizontalroadnum];
-	private static Road2[] VerticalRoads = new Road2[verticalroadnum];
 	public static int roadwidth = 50;
 	private static double roadoffset;
-	
+	private int colorChance = 0;
 	private static int xSpawn, ySpawn;
 	private static int spawnTimer = 0, spawnRate = 50;
 	private int[] horizSpawns = new int[5];
 	private int[] horizSpawnsA = new int[5];
 	private int[] vertSpawns = new int[7];
 	private int[] vertSpawnsA = new int[7];
+	private static int simTime = 0, simMaxTicks = 1000;
+	private static int redSpawn = 0, yellowSpawn = 0, blueSpawn = 0, purpleSpawn = 0;
+	private static int[] spawnNumbers = new int[4];
+	private static List<Intersection> intersectionList = new ArrayList<Intersection>();
+
 	
 	
 	public TrafficWorld(){
@@ -37,43 +41,128 @@ public class TrafficWorld extends World {
 		
 		gap = ((HEIGHT - (roadwidth * horizontalroadnum)) / (horizontalroadnum - 1));
 		horizontalspacing = roadwidth + gap;
-		System.out.println(horizontalspacing);
 		gap = ((WIDTH - (roadwidth * verticalroadnum)) / (verticalroadnum - 1));
 		verticalspacing = roadwidth + gap;
-		System.out.println(verticalspacing);
 		roadoffset = (roadwidth*.25);
 		//Car test = new Car(this,180,50,200,1);
+		PurpleCar pcar = new PurpleCar(this,180,900,13,2);
+
 
 		
 		placeIntersections();
 		placeHorizontalRoads();
 		placeVerticalRoads();
 	}
+	public static int getSimTime(){
+		return simTime;
+	}
 	
+	public static int getSpawnNumbers(String color){
+		if (color.equals("red")){
+			return redSpawn;
+		} else if (color.equals("yellow")){
+			return yellowSpawn;
+		} else if (color.equals("blue")){
+			return blueSpawn;
+		} else if (color.equals("purple")){
+			return purpleSpawn;
+		} else {
+			return -1;
+		}
+	}
 	
+	private void colorSwitch(){
+		colorChance = rand.nextInt(4);
+		switch(colorChance){
+		case 0:
+			spawnRed();
+			redSpawn++;
+			break;
+		case 1:
+			spawnBlue();
+			blueSpawn++;
+			break;
+		case 2:
+			spawnPurple();
+			purpleSpawn++;
+			break;
+		case 3:
+			spawnYellow();
+			yellowSpawn++;
 
-	
-	
-	
-	
+			break;
+		}
+	}
+
+	private void spawnPurple() {
+		if (rand.nextInt(2) == 0){
+			if (rand.nextInt(2) == 0){
+				PurpleCar pcar = new PurpleCar(this,180,xSpawn,horizSpawnsA[rand.nextInt(5)],2);
+			} else if (rand.nextInt(2) == 1){
+				PurpleCar pcar = new PurpleCar(this,0,xSpawn,horizSpawns[rand.nextInt(5)],2);
+			}
+		} else if (rand.nextInt(2) == 1) {
+			if (rand.nextInt(2) == 0){
+				PurpleCar pcar = new PurpleCar(this,270,vertSpawnsA[rand.nextInt(7)],ySpawn,2);
+			} else if (rand.nextInt(2) == 1){
+				PurpleCar pcar = new PurpleCar(this,90,vertSpawns[rand.nextInt(7)],ySpawn,2);
+			}
+		}
+	}
+	private void spawnYellow() {
+		if (rand.nextInt(2) == 0){
+			if (rand.nextInt(2) == 0){
+				YellowCar ycar = new YellowCar(this,180,xSpawn,horizSpawnsA[rand.nextInt(5)],2);
+			} else if (rand.nextInt(2) == 1){
+				YellowCar ycar = new YellowCar(this,0,xSpawn,horizSpawns[rand.nextInt(5)],2);
+			}
+		} else if (rand.nextInt(2) == 1) {
+			if (rand.nextInt(2) == 0){
+				YellowCar ycar = new YellowCar(this,270,vertSpawnsA[rand.nextInt(7)],ySpawn,2);
+			} else if (rand.nextInt(2) == 1){
+				YellowCar ycar = new YellowCar(this,90,vertSpawns[rand.nextInt(7)],ySpawn,2);
+			}
+		}
+	}
+	private void spawnRed() {
+		if (rand.nextInt(2) == 0){
+			if (rand.nextInt(2) == 0){
+				RedCar rcar = new RedCar(this,180,xSpawn,horizSpawnsA[rand.nextInt(5)],2);
+			} else if (rand.nextInt(2) == 1){
+				RedCar rcar = new RedCar(this,0,xSpawn,horizSpawns[rand.nextInt(5)],2);
+			}
+		} else if (rand.nextInt(2) == 1) {
+			if (rand.nextInt(2) == 0){
+				RedCar rcar = new RedCar(this,270,vertSpawnsA[rand.nextInt(7)],ySpawn,2);
+			} else if (rand.nextInt(2) == 1){
+				RedCar rcar = new RedCar(this,90,vertSpawns[rand.nextInt(7)],ySpawn,2);
+			}
+		}
+	}
+	private void spawnBlue() {
+		if (rand.nextInt(2) == 0){
+			if (rand.nextInt(2) == 0){
+				BlueCar bcar = new BlueCar(this,180,xSpawn,horizSpawnsA[rand.nextInt(5)],2);
+			} else if (rand.nextInt(2) == 1){
+				BlueCar bcar = new BlueCar(this,0,xSpawn,horizSpawns[rand.nextInt(5)],2);
+			}
+		} else if (rand.nextInt(2) == 1) {
+			if (rand.nextInt(2) == 0){
+				BlueCar bcar = new BlueCar(this,270,vertSpawnsA[rand.nextInt(7)],ySpawn,2);
+			} else if (rand.nextInt(2) == 1){
+				BlueCar bcar = new BlueCar(this,90,vertSpawns[rand.nextInt(7)],ySpawn,2);
+			}
+		}
+	}
+	public static int getTotalSpawns(){
+		return redSpawn + purpleSpawn + yellowSpawn + purpleSpawn;
+	}
 	private void spawnCar(){
 		xSpawn = rand.nextInt(WIDTH);
 		ySpawn = rand.nextInt(HEIGHT);
 		spawnTimer++;
 		if (spawnTimer == spawnRate){
-			if (rand.nextInt(2) == 0){
-				if (rand.nextInt(2) == 0){
-					Car car = new Car(this,180,xSpawn,horizSpawnsA[rand.nextInt(5)],2);
-				} else if (rand.nextInt(2) == 1){
-					Car car = new Car(this,0,xSpawn,horizSpawns[rand.nextInt(5)],2);
-				}
-			} else if (rand.nextInt(2) == 1) {
-				if (rand.nextInt(2) == 0){
-					Car car = new Car(this,270,vertSpawnsA[rand.nextInt(7)],ySpawn,2);
-				} else if (rand.nextInt(2) == 1){
-					Car car = new Car(this,90,vertSpawns[rand.nextInt(7)],ySpawn,2);
-				}
-			}
+			colorSwitch();
 			spawnTimer = 0;
 		}
 	}
@@ -82,6 +171,7 @@ public class TrafficWorld extends World {
 		for (int i = 25; i < WIDTH; i+=verticalspacing+1){
 			for (int j = 25; j < HEIGHT; j+=horizontalspacing) {
 				Intersection intersection = new Intersection(roadwidth);
+				intersectionList.add(intersection);
 				this.addObject(intersection, i, j);
 				intersection.addLightsVertical();
 				intersection.addLightsHorizontal();
@@ -110,6 +200,11 @@ public class TrafficWorld extends World {
 	}
 	public void act(){
 		spawnCar();
-
+		simTime++;
+		if (simTime == simMaxTicks) {
+			  Greenfoot.stop();
+			  StatBoard sb = new StatBoard(intersectionList);
+		}
+		
 	}
 }
