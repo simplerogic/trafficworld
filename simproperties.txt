@@ -1,0 +1,6 @@
+SimTime      =1000
+CarSpawnRate =50
+RedSpawn%    =25
+YellowSpawn% =25
+BlueSpawn%   =25
+PurpleSpawn% =25

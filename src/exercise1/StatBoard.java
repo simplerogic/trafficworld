@@ -15,7 +15,7 @@ public class StatBoard {
 		System.out.println("Total Blocks Traveled: " + Intersection.getAmountCarsIn());
 		blocksTraveled();
 		System.out.println("Average Number of Cars Per intersection: " + averageCarsPerIntersection(intersectionList));
-		System.out.println("Average Interarrival time: " + averageInterArrivalTime(intersectionList));
+		System.out.println("Average Innerarrival time: " + averageInterArrivalTime(intersectionList));
 	}
 
 	public double calcAvg(String color){
@@ -39,21 +39,22 @@ public class StatBoard {
 	
 	public double averageInterArrivalTime(List<Intersection> intersectionList){
 		double innerarrivalTime = 0;
+		double innerarrivalAvg = 0;
 		double average = 0;
 		int carCount;
-		for(Intersection intersection : intersectionList){
-			carCount = Intersection.getAmountCarsIn();
+		for(Intersection i : intersectionList){
+			carCount = i.getAmountCarsIn();
 			if(carCount == 0){
 				carCount = 1;
 			}
-			innerarrivalTime += TrafficWorld.getSimTime() / carCount;
+			innerarrivalAvg += TrafficWorld.getSimTime() / carCount;
 			}
 		
-		if(innerarrivalTime == 0){
+		if(innerarrivalAvg == 0){
 			average = 0;
 		}
 		else{
-			average = innerarrivalTime / intersectionList.size();
+			average = innerarrivalAvg / intersectionList.size();
 		}
 		
 		return average;
